@@ -149,14 +149,6 @@ function ProductShowcase() {
                   inputMode="numeric"
                   className="header-search-input"
                 />
-                {searchQuery && (
-                  <button
-                    className="search-clear-btn"
-                    onClick={() => handleSearchChange('')}
-                  >
-                    ✕
-                  </button>
-                )}
               </div>
               <button 
                 className={`header-random-btn ${!isRandom ? 'random-mode' : 'ordered-mode'} ${isButtonActive ? 'active' : ''}`}
