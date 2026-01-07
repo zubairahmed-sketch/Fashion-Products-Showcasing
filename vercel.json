@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd apps/showcase && npm run build",
+  "outputDirectory": "apps/showcase/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
