@@ -102,6 +102,13 @@
     font-size: 0.65rem;
   }
 
+  .product-id-overlay {
+    font-size: 0.65rem;
+    padding: 4px 8px;
+    bottom: var(--spacing-sm);
+    right: var(--spacing-sm);
+  }
+
   .product-link-btn {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: 0.7rem;
@@ -119,5 +126,10 @@
 
   .product-image-container {
     aspect-ratio: 1;
+  }
+
+  .product-id-overlay {
+    font-size: 0.6rem;
+    padding: 3px 7px;
   }
 }
