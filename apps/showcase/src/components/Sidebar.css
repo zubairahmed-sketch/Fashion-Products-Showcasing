@@ -118,7 +118,7 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .category-item {
-        font-size: 1rem;
+        font-size: 1.3rem;
     }
   .sidebar-toggle {
     display: flex;
