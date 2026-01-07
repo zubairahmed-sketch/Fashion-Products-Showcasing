@@ -107,14 +107,14 @@
 
 @media (max-width: 600px) {
   .product-grid {
-    grid-template-columns: repeat(2, minmax(96px, 1fr));
+    grid-template-columns: repeat(2, minmax(100px, 1fr));
     gap: var(--spacing-md);
   }
 }
 
 @media (max-width: 480px) {
   .product-grid {
-    grid-template-columns: repeat(2, minmax(96px, 1fr));
+    grid-template-columns: repeat(2, minmax(100px, 1fr));
     gap: var(--spacing-sm);
   }
 
