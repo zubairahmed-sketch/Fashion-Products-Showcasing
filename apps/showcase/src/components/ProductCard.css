@@ -1,0 +1,123 @@
+.product-card {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+
+
+.product-image-container {
+  width: 100%;
+  aspect-ratio: 0.8;
+  background-color: var(--color-bg-secondary);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-normal);
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+}
+
+
+
+.product-id-overlay {
+  position: absolute;
+  bottom: var(--spacing-md);
+  right: var(--spacing-md);
+  background-color: black;
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  font-size: 0.71rem;
+  font-weight: 600;
+  z-index: 10;
+}
+
+.product-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+}
+
+.product-info {
+  padding: var(--spacing-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex-grow: 1;
+}
+
+.product-id {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .product-card {
+    border-radius: var(--radius-md);
+  }
+
+  .product-image-container {
+    aspect-ratio: 1;
+  }
+
+  .product-info {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-xs);
+  }
+
+  .product-name {
+    font-size: 0.85rem;
+  }
+
+  .product-category {
+    font-size: 0.7rem;
+  }
+
+  .product-id {
+    font-size: 0.65rem;
+  }
+
+  .product-link-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .product-card:hover .product-image {
+    transform: scale(1.02);
+  }
+
+  .product-image-container {
+    aspect-ratio: 1;
+  }
+}
