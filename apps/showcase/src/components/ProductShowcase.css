@@ -100,11 +100,11 @@
 
 .header-random-btn {
   padding: var(--spacing-md) var(--spacing-lg);
-  background-color: rgb(71, 24, 71);
+  background-color: rgb(65, 23, 65);
   color: white;
-  border: 2px solid rgb(54, 54, 54);
+  border: 1px solid rgb(159, 73, 159);
   border-radius: var(--radius-lg);
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
   transition: all var(--transition-normal);
   cursor: pointer;
@@ -166,6 +166,7 @@
   .header-random-btn {
     width: 100%;
     justify-content: center;
+    font-size: 1.2rem;
   }
 }
 
@@ -179,15 +180,15 @@
   }
 
   .header-search-input {
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md);
     padding-left: 38px;
     padding-right: 36px;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
   }
 
   .header-random-btn {
     padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.9rem;
+    font-size: 1.2rem;
   }
 }
 
