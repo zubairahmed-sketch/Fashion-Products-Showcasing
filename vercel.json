@@ -1,7 +1,4 @@
 {
-  "root": "apps/showcase",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
