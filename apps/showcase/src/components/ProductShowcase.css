@@ -1,6 +1,6 @@
 .product-showcase {
   min-height: 100vh;
-  background-color: var(--color-bg-primary);
+  background-color: #000000;
   padding: var(--spacing-lg);
 }
 
