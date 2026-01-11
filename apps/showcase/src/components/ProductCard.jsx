@@ -3,22 +3,22 @@ import './ProductCard.css'
 function ProductCard({ product }) {
   const {
     productId,
-    imageUrl,
-    sourceUrl,
+    imageurl,
+    sourceurl,
   } = product
 
   const handleClick = () => {
-    if (sourceUrl) {
-      window.open(sourceUrl, '_blank')
+    if (sourceurl) {
+      window.open(sourceurl, '_blank')
     }
   }
 
   return (
     <div className="product-card">
       <div className="product-image-container">
-        {imageUrl ? (
+        {imageurl ? (
           <img
-            src={imageUrl}
+            src={imageurl}
             alt={`Product ${productId}`}
             className="product-image"
             onClick={handleClick}
