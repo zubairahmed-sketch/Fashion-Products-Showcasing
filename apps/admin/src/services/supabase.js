@@ -65,29 +65,13 @@ export const productService = {
   },
 
   async update(id, product) {
+    // Simply update the product - don't try to fetch relationships
     const { error } = await supabase
       .from('products')
       .update(product)
       .eq('id', id)
     if (error) throw error
-    
-    // Fetch the updated product with related data
-    const { data, error: fetchError } = await supabase
-      .from('products')
-      .select('*, categories(name)')
-      .eq('id', id)
-      .single()
-    if (fetchError) {
-      // If the join fails, just fetch the basic product data
-      const { data: basicData, error: basicError } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single()
-      if (basicError) throw basicError
-      return basicData
-    }
-    return data
+    return { id, ...product }
   },
 
   async delete(id) {
