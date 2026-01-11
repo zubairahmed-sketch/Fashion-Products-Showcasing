@@ -74,10 +74,19 @@ export const productService = {
     // Fetch the updated product with related data
     const { data, error: fetchError } = await supabase
       .from('products')
-      .select('*, categories(id, name)')
+      .select('*, categories(name)')
       .eq('id', id)
       .single()
-    if (fetchError) throw fetchError
+    if (fetchError) {
+      // If the join fails, just fetch the basic product data
+      const { data: basicData, error: basicError } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single()
+      if (basicError) throw basicError
+      return basicData
+    }
     return data
   },
 

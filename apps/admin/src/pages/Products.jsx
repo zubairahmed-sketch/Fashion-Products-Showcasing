@@ -48,7 +48,8 @@ function Products() {
       console.log('Updating product with data:', formData)
       
       // Update product in database
-      await productService.update(editingProduct.id, formData)
+      const updatedProduct = await productService.update(editingProduct.id, formData)
+      console.log('Product updated successfully:', updatedProduct)
       
       // Delete old image if a new one was uploaded
       if (oldImageUrl && oldImageUrl !== formData.imageurl) {
@@ -65,6 +66,7 @@ function Products() {
       await loadData()
       setEditingProduct(null)
       setShowForm(false)
+      alert('Product updated successfully!')
     } catch (error) {
       console.error('Error updating product:', error)
       alert('Failed to update product: ' + error.message)
