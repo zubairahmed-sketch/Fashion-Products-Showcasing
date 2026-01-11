@@ -2,22 +2,12 @@ import { useState, useEffect } from 'react'
 import { Shuffle, Search, Filter } from 'lucide-react'
 import ProductGrid from './ProductGrid'
 import Sidebar from './Sidebar'
-import { mockProducts } from '../data/mockProducts'
+import { productService, categoryService } from '../services/supabase'
 import './ProductShowcase.css'
-
-const CATEGORIES = [
-  { id: 'all', label: 'All' },
-  { id: 'pants_shorts', label: 'Pants/Shorts' },
-  { id: 'rings', label: 'Rings' },
-  { id: 'belts', label: 'Belts' },
-  { id: 'accessories', label: 'Accessories' },
-  { id: 'bags', label: 'Bags' },
-  { id: 'footwear', label: 'Footwear' },
-  { id: 'halloween', label: 'Halloween' },
-]
 
 function ProductShowcase() {
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -28,33 +18,28 @@ function ProductShowcase() {
 
   // Calculate category counts
   const getCategoryCounts = () => {
-    const counts = {}
-    CATEGORIES.forEach(cat => {
-      if (cat.id === 'all') {
-        counts[cat.id] = products.length
-      } else {
-        counts[cat.id] = products.filter(
-          p => p.category?.toLowerCase() === cat.id.toLowerCase()
-        ).length
-      }
+    const counts = { all: products.length }
+    categories.forEach(cat => {
+      counts[cat.id] = products.filter(p => p.category_id === cat.id).length
     })
     return counts
   }
 
-  // Fetch products from API
+  // Fetch products and categories from Supabase
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true)
-        // TODO: Replace with actual API endpoint
-        // const response = await fetch('http://localhost:5000/api/products')
-        // const data = await response.json()
-        // setProducts(data)
+        const [productsData, categoriesData] = await Promise.all([
+          productService.getAll(),
+          categoryService.getAll()
+        ])
         
-        // Using mock data for now - sort by productId ascending by default
-        const sorted = [...mockProducts].sort((a, b) => a.productId - b.productId)
+        // Sort by productId ascending by default
+        const sorted = productsData.sort((a, b) => a.productId - b.productId)
         setProducts(sorted)
         setFilteredProducts(sorted)
+        setCategories(categoriesData)
       } catch (err) {
         setError('Failed to load products')
         console.error(err)
@@ -63,7 +48,7 @@ function ProductShowcase() {
       }
     }
 
-    fetchProducts()
+    fetchData()
   }, [])
 
   // Apply filters and search
@@ -72,9 +57,10 @@ function ProductShowcase() {
 
     // Category filter
     if (selectedCategory !== 'all') {
-      result = result.filter(
-        (product) => product.category?.toLowerCase() === selectedCategory.toLowerCase()
-      )
+      const selectedCat = categories.find(c => c.id === parseInt(selectedCategory))
+      if (selectedCat) {
+        result = result.filter(p => p.category_id === selectedCat.id)
+      }
     }
 
     // Search by product ID
@@ -86,7 +72,7 @@ function ProductShowcase() {
     }
 
     setFilteredProducts(result)
-  }, [products, selectedCategory, searchQuery])
+  }, [products, categories, selectedCategory, searchQuery])
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId)
@@ -123,12 +109,22 @@ function ProductShowcase() {
     setSelectedCategory('all')
   }
 
+  // Build category list for sidebar
+  const buildCategories = () => {
+    const all = { id: 'all', label: 'All' }
+    const cats = categories.map(cat => ({
+      id: cat.id,
+      label: cat.name
+    }))
+    return [all, ...cats]
+  }
+
   return (
     <div className="product-showcase">
       <div className="showcase-container">
         {/* Sidebar on the left */}
         <Sidebar
-          categories={CATEGORIES}
+          categories={buildCategories()}
           selectedCategory={selectedCategory}
           onCategoryChange={handleCategoryChange}
           categoryCounts={getCategoryCounts()}

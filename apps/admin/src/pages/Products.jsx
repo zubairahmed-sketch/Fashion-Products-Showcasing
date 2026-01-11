@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2 } from 'lucide-react'
 import ProductForm from '../components/ProductForm'
-import { storageService } from '../utils/storage'
+import { productService, categoryService } from '../services/supabase'
 import './Products.css'
 
 function Products() {
@@ -9,29 +9,57 @@ function Products() {
   const [categories, setCategories] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
   
   useEffect(() => {
-    setProducts(storageService.getProducts())
-    setCategories(storageService.getCategories())
+    loadData()
   }, [])
   
-  const handleAddProduct = (formData) => {
-    storageService.addProduct(formData)
-    setProducts(storageService.getProducts())
-    setShowForm(false)
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const [productsData, categoriesData] = await Promise.all([
+        productService.getAll(),
+        categoryService.getAll()
+      ])
+      setProducts(productsData)
+      setCategories(categoriesData)
+    } catch (error) {
+      console.error('Error loading data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
   
-  const handleUpdateProduct = (formData) => {
-    storageService.updateProduct(editingProduct.productId, formData)
-    setProducts(storageService.getProducts())
-    setEditingProduct(null)
-    setShowForm(false)
+  const handleAddProduct = async (formData) => {
+    try {
+      await productService.create(formData)
+      await loadData()
+      setShowForm(false)
+    } catch (error) {
+      console.error('Error adding product:', error)
+    }
   }
   
-  const handleDeleteProduct = (productId) => {
+  const handleUpdateProduct = async (formData) => {
+    try {
+      await productService.update(editingProduct.id, formData)
+      await loadData()
+      setEditingProduct(null)
+      setShowForm(false)
+    } catch (error) {
+      console.error('Error updating product:', error)
+    }
+  }
+  
+  const handleDeleteProduct = async (productId, id) => {
     if (confirm('Are you sure you want to delete this product?')) {
-      storageService.deleteProduct(productId)
-      setProducts(storageService.getProducts())
+      try {
+        await productService.delete(id)
+        await loadData()
+      } catch (error) {
+        console.error('Error deleting product:', error)
+      }
     }
   }
   
@@ -57,7 +85,11 @@ function Products() {
       </div>
       
       <div className="products-table-wrapper">
-        {products.length === 0 ? (
+        {loading ? (
+          <div className="empty-state">
+            <p>Loading products...</p>
+          </div>
+        ) : products.length === 0 ? (
           <div className="empty-state">
             <p>No products yet. Add your first product!</p>
           </div>
@@ -74,9 +106,9 @@ function Products() {
             </thead>
             <tbody>
               {products.map(product => (
-                <tr key={product.productId}>
+                <tr key={product.id}>
                   <td className="id-cell">{product.productId}</td>
-                  <td>{product.category}</td>
+                  <td>{product.categories?.name || 'Unknown'}</td>
                   <td className="image-cell">
                     <img src={product.imageUrl} alt={`Product ${product.productId}`} />
                   </td>
@@ -95,7 +127,7 @@ function Products() {
                     </button>
                     <button
                       className="btn-icon delete"
-                      onClick={() => handleDeleteProduct(product.productId)}
+                      onClick={() => handleDeleteProduct(product.productId, product.id)}
                       title="Delete"
                     >
                       <Trash2 size={18} />

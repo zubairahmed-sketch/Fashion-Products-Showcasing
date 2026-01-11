@@ -1,40 +1,64 @@
 import { useState } from 'react'
+import { storageService } from '../services/supabase'
 import './ProductForm.css'
 
 function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
   const [formData, setFormData] = useState(
     initialData || {
-      category: categories[0] || '',
+      productId: '',
+      category_id: categories.length > 0 ? categories[0].id : '',
       imageUrl: '',
       sourceUrl: ''
     }
   )
   const [imagePreview, setImagePreview] = useState(initialData?.imageUrl || '')
+  const [uploading, setUploading] = useState(false)
   
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
   
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0]
     if (file) {
-      // Mock - in production, upload to Supabase
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        setImagePreview(event.target.result)
-        setFormData(prev => ({ ...prev, imageUrl: event.target.result }))
+      try {
+        setUploading(true)
+        
+        // Create a preview
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          setImagePreview(event.target.result)
+        }
+        reader.readAsDataURL(file)
+        
+        // Upload to Supabase storage
+        const fileName = `${Date.now()}-${file.name}`
+        const publicUrl = await storageService.uploadImage(file, fileName)
+        
+        setFormData(prev => ({ ...prev, imageUrl: publicUrl }))
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        alert('Failed to upload image')
+      } finally {
+        setUploading(false)
       }
-      reader.readAsDataURL(file)
     }
   }
   
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!formData.category || !formData.imageUrl || !formData.sourceUrl) {
+    
+    if (!formData.productId || !formData.category_id || !formData.imageUrl || !formData.sourceUrl) {
       alert('Please fill all fields')
       return
     }
+    
+    if (uploading) {
+      alert('Please wait for image upload to complete')
+      return
+    }
+    
     onSubmit(formData)
   }
   
@@ -44,27 +68,41 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
         <h2>{initialData ? 'Edit Product' : 'Add New Product'}</h2>
         
         <div className="form-group">
+          <label>Product ID *</label>
+          <input
+            type="number"
+            name="productId"
+            value={formData.productId}
+            onChange={handleInputChange}
+            placeholder="e.g., 1, 2, 3"
+            required
+            disabled={initialData !== null}
+          />
+        </div>
+        
+        <div className="form-group">
           <label>Category *</label>
           <select
-            name="category"
-            value={formData.category}
+            name="category_id"
+            value={formData.category_id}
             onChange={handleInputChange}
             required
           >
             <option value="">Select category</option>
             {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </select>
         </div>
         
         <div className="form-group">
-          <label>Product Image *</label>
+          <label>Product Image * {uploading && <span className="uploading">(Uploading...)</span>}</label>
           <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
             required={!initialData}
+            disabled={uploading}
           />
           {imagePreview && (
             <div className="image-preview">
@@ -86,10 +124,10 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
         </div>
         
         <div className="form-actions">
-          <button type="submit" className="btn-primary">
+          <button type="submit" className="btn-primary" disabled={uploading}>
             {initialData ? 'Update' : 'Add'} Product
           </button>
-          <button type="button" className="btn-secondary" onClick={onCancel}>
+          <button type="button" className="btn-secondary" onClick={onCancel} disabled={uploading}>
             Cancel
           </button>
         </div>
