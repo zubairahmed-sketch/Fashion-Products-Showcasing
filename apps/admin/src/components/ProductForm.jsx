@@ -5,7 +5,7 @@ import './ProductForm.css'
 function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
   const [formData, setFormData] = useState(
     initialData || {
-      productId: '',
+      productid: '',
       category_id: categories.length > 0 ? categories[0].id : '',
       imageurl: '',
       sourceurl: ''
@@ -13,6 +13,7 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
   )
   const [imagePreview, setImagePreview] = useState(initialData?.imageurl || '')
   const [uploading, setUploading] = useState(false)
+  const [oldImageUrl, setOldImageUrl] = useState(initialData?.imageurl || '')
   
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -38,6 +39,11 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
         const publicUrl = await storageService.uploadImage(file, fileName)
         console.log('Upload successful, public URL:', publicUrl)
         
+        // If updating and old image exists, mark it for deletion
+        if (initialData?.imageurl) {
+          setOldImageUrl(initialData.imageurl)
+        }
+        
         setFormData(prev => ({ ...prev, imageurl: publicUrl }))
       } catch (error) {
         console.error('Error uploading image:', error)
@@ -51,7 +57,7 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!formData.productId || !formData.category_id || !formData.imageurl || !formData.sourceurl) {
+    if (!formData.productid || !formData.category_id || !formData.imageurl || !formData.sourceurl) {
       alert('Please fill all fields')
       return
     }
@@ -61,7 +67,8 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
       return
     }
     
-    onSubmit(formData)
+    // Call onSubmit and delete old image after successful update
+    onSubmit(formData, oldImageUrl)
   }
   
   return (
@@ -73,8 +80,8 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
           <label>Product ID *</label>
           <input
             type="number"
-            name="productId"
-            value={formData.productId}
+            name="productid"
+            value={formData.productid}
             onChange={handleInputChange}
             placeholder="e.g., 1, 2, 3"
             required

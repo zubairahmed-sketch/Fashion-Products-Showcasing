@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2 } from 'lucide-react'
 import ProductForm from '../components/ProductForm'
-import { productService, categoryService } from '../services/supabase'
+import { productService, categoryService, storageService } from '../services/supabase'
 import './Products.css'
 
 function Products() {
@@ -33,22 +33,37 @@ function Products() {
   
   const handleAddProduct = async (formData) => {
     try {
+      console.log('Adding product with data:', formData)
       await productService.create(formData)
       await loadData()
       setShowForm(false)
     } catch (error) {
       console.error('Error adding product:', error)
+      alert('Failed to add product: ' + error.message)
     }
   }
   
-  const handleUpdateProduct = async (formData) => {
+  const handleUpdateProduct = async (formData, oldImageUrl) => {
     try {
+      console.log('Updating product with data:', formData)
       await productService.update(editingProduct.id, formData)
+      
+      // Delete old image if it was replaced
+      if (oldImageUrl && oldImageUrl !== formData.imageurl) {
+        try {
+          const fileName = oldImageUrl.split('/').pop().split('?')[0]
+          await storageService.deleteImage(fileName)
+        } catch (err) {
+          console.warn('Could not delete old image:', err)
+        }
+      }
+      
       await loadData()
       setEditingProduct(null)
       setShowForm(false)
     } catch (error) {
       console.error('Error updating product:', error)
+      alert('Failed to update product: ' + error.message)
     }
   }
   
@@ -107,10 +122,10 @@ function Products() {
             <tbody>
               {products.map(product => (
                 <tr key={product.id}>
-                  <td className="id-cell">{product.productId}</td>
+                  <td className="id-cell">{product.productid}</td>
                   <td>{product.categories?.name || 'Unknown'}</td>
                   <td className="image-cell">
-                    <img src={product.imageurl} alt={`Product ${product.productId}`} />
+                    <img src={product.imageurl} alt={`Product ${product.productid}`} />
                   </td>
                   <td className="url-cell">
                     <a href={product.sourceurl} target="_blank" rel="noopener noreferrer">
@@ -127,7 +142,7 @@ function Products() {
                     </button>
                     <button
                       className="btn-icon delete"
-                      onClick={() => handleDeleteProduct(product.productId, product.id)}
+                      onClick={() => handleDeleteProduct(product.productid, product.id)}
                       title="Delete"
                     >
                       <Trash2 size={18} />
