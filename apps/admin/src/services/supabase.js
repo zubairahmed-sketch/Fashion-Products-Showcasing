@@ -65,13 +65,15 @@ export const productService = {
   },
 
   async update(id, product) {
-    // Simply update the product - don't try to fetch relationships
-    const { error } = await supabase
+    // Update product and return only scalar columns (no relationships)
+    const { data, error } = await supabase
       .from('products')
       .update(product)
       .eq('id', id)
+      .select('id, productid, category_id, imageurl, sourceurl')
+      .single()
     if (error) throw error
-    return { id, ...product }
+    return data
   },
 
   async delete(id) {
