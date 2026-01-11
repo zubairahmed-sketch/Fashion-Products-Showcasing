@@ -46,18 +46,22 @@ function Products() {
   const handleUpdateProduct = async (formData, oldImageUrl) => {
     try {
       console.log('Updating product with data:', formData)
+      
+      // Update product in database
       await productService.update(editingProduct.id, formData)
       
-      // Delete old image if it was replaced
+      // Delete old image if a new one was uploaded
       if (oldImageUrl && oldImageUrl !== formData.imageurl) {
         try {
           const fileName = oldImageUrl.split('/').pop().split('?')[0]
           await storageService.deleteImage(fileName)
+          console.log('Old image deleted:', fileName)
         } catch (err) {
           console.warn('Could not delete old image:', err)
         }
       }
       
+      // Reload all data
       await loadData()
       setEditingProduct(null)
       setShowForm(false)

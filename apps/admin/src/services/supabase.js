@@ -65,13 +65,20 @@ export const productService = {
   },
 
   async update(id, product) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('products')
       .update(product)
       .eq('id', id)
-      .select('*, categories(id, name)')
     if (error) throw error
-    return data[0]
+    
+    // Fetch the updated product with related data
+    const { data, error: fetchError } = await supabase
+      .from('products')
+      .select('*, categories(id, name)')
+      .eq('id', id)
+      .single()
+    if (fetchError) throw fetchError
+    return data
   },
 
   async delete(id) {

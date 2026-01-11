@@ -67,7 +67,7 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
       return
     }
     
-    // Call onSubmit and delete old image after successful update
+    // Pass oldImageUrl for update operations
     onSubmit(formData, oldImageUrl)
   }
   
