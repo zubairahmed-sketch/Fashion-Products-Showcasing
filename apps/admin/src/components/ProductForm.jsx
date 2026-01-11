@@ -7,11 +7,11 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
     initialData || {
       productId: '',
       category_id: categories.length > 0 ? categories[0].id : '',
-      imageUrl: '',
-      sourceUrl: ''
+      imageurl: '',
+      sourceurl: ''
     }
   )
-  const [imagePreview, setImagePreview] = useState(initialData?.imageUrl || '')
+  const [imagePreview, setImagePreview] = useState(initialData?.imageurl || '')
   const [uploading, setUploading] = useState(false)
   
   const handleInputChange = (e) => {
@@ -34,12 +34,14 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
         
         // Upload to Supabase storage
         const fileName = `${Date.now()}-${file.name}`
+        console.log('Uploading file:', fileName)
         const publicUrl = await storageService.uploadImage(file, fileName)
+        console.log('Upload successful, public URL:', publicUrl)
         
-        setFormData(prev => ({ ...prev, imageUrl: publicUrl }))
+        setFormData(prev => ({ ...prev, imageurl: publicUrl }))
       } catch (error) {
         console.error('Error uploading image:', error)
-        alert('Failed to upload image')
+        alert('Failed to upload image: ' + error.message)
       } finally {
         setUploading(false)
       }
@@ -49,7 +51,7 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!formData.productId || !formData.category_id || !formData.imageUrl || !formData.sourceUrl) {
+    if (!formData.productId || !formData.category_id || !formData.imageurl || !formData.sourceurl) {
       alert('Please fill all fields')
       return
     }
@@ -115,8 +117,8 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
           <label>Source URL *</label>
           <input
             type="url"
-            name="sourceUrl"
-            value={formData.sourceUrl}
+            name="sourceurl"
+            value={formData.sourceurl}
             onChange={handleInputChange}
             placeholder="https://example.com/product"
             required

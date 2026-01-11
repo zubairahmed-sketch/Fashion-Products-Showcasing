@@ -1,9 +1,32 @@
-import { storageService } from '../utils/storage'
+import { useState, useEffect } from 'react'
+import { categoryService, productService } from '../services/supabase'
 import './Dashboard.css'
 
 function Dashboard() {
-  const products = storageService.getProducts()
-  const categories = storageService.getCategories()
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        console.log('Fetching dashboard data...')
+        const productsData = await productService.getAll()
+        console.log('Products fetched:', productsData)
+        const categoriesData = await categoryService.getAll()
+        console.log('Categories fetched:', categoriesData)
+        setProducts(productsData || [])
+        setCategories(categoriesData || [])
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
   
   return (
     <div className="dashboard-page">
@@ -13,11 +36,11 @@ function Dashboard() {
       
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-number">{products.length}</div>
+          <div className="stat-number">{loading ? '-' : products.length}</div>
           <div className="stat-label">Total Products</div>
         </div>
         <div className="stat-card">
-          <div className="stat-number">{categories.length}</div>
+          <div className="stat-number">{loading ? '-' : categories.length}</div>
           <div className="stat-label">Total Categories</div>
         </div>
       </div>

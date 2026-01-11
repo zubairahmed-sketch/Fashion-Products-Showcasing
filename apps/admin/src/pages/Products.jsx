@@ -110,11 +110,11 @@ function Products() {
                   <td className="id-cell">{product.productId}</td>
                   <td>{product.categories?.name || 'Unknown'}</td>
                   <td className="image-cell">
-                    <img src={product.imageUrl} alt={`Product ${product.productId}`} />
+                    <img src={product.imageurl} alt={`Product ${product.productId}`} />
                   </td>
                   <td className="url-cell">
-                    <a href={product.sourceUrl} target="_blank" rel="noopener noreferrer">
-                      {product.sourceUrl.substring(0, 40)}...
+                    <a href={product.sourceurl} target="_blank" rel="noopener noreferrer">
+                      {product.sourceurl.substring(0, 40)}...
                     </a>
                   </td>
                   <td className="actions-cell">

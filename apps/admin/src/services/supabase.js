@@ -40,7 +40,7 @@ export const productService = {
     const { data, error } = await supabase
       .from('products')
       .select('*, categories(id, name)')
-      .order('productId', { ascending: true })
+      .order('created_at', { ascending: true })
     if (error) throw error
     return data
   },
@@ -50,7 +50,7 @@ export const productService = {
       .from('products')
       .select('*, categories(id, name)')
       .eq('category_id', categoryId)
-      .order('productId', { ascending: true })
+      .order('created_at', { ascending: true })
     if (error) throw error
     return data
   },
