@@ -2,7 +2,7 @@ import './ProductCard.css'
 
 function ProductCard({ product }) {
   const {
-    productId,
+    productid,
     imageurl,
     sourceurl,
   } = product
@@ -19,7 +19,7 @@ function ProductCard({ product }) {
         {imageurl ? (
           <img
             src={imageurl}
-            alt={`Product ${productId}`}
+            alt={`Product ${productid}`}
             className="product-image"
             onClick={handleClick}
           />
@@ -28,7 +28,7 @@ function ProductCard({ product }) {
             <span>No Image</span>
           </div>
         )}
-        <div className="product-id-overlay">{productId}</div>
+        <div className="product-id-overlay">{productid}</div>
       </div>
     </div>
   )
