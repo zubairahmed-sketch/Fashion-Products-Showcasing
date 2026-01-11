@@ -106,6 +106,11 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
         
         <div className="form-group">
           <label>Product Image * {uploading && <span className="uploading">(Uploading...)</span>}</label>
+          {initialData && imagePreview && (
+            <div className="image-current-status">
+              ✓ Image already uploaded - Select a new image to replace it
+            </div>
+          )}
           <input
             type="file"
             accept="image/*"
