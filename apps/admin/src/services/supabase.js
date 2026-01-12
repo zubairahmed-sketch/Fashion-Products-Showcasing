@@ -40,7 +40,7 @@ export const productService = {
     const { data, error } = await supabase
       .from('products')
       .select('*, categories(id, name)')
-      .order('created_at', { ascending: true })
+      .order('productid', { ascending: true })
     if (error) throw error
     return data
   },
@@ -50,18 +50,30 @@ export const productService = {
       .from('products')
       .select('*, categories(id, name)')
       .eq('category_id', categoryId)
-      .order('created_at', { ascending: true })
+      .order('productid', { ascending: true })
     if (error) throw error
     return data
   },
 
   async create(product) {
+    // Determine next productid (1..n sequence)
+    const { data: maxRows, error: maxErr } = await supabase
+      .from('products')
+      .select('productid')
+      .order('productid', { ascending: false })
+      .limit(1)
+    if (maxErr) throw maxErr
+
+    const nextProductId = (maxRows?.[0]?.productid || 0) + 1
+    const payload = { ...product, productid: nextProductId }
+
     const { data, error } = await supabase
       .from('products')
-      .insert([product])
+      .insert([payload])
       .select('*, categories(id, name)')
+      .single()
     if (error) throw error
-    return data[0]
+    return data
   },
 
   async update(id, product) {
@@ -82,6 +94,28 @@ export const productService = {
       .delete()
       .eq('id', id)
     if (error) throw error
+  },
+
+  async resequenceProductIds() {
+    // Re-pack productid to contiguous 1..n based on creation order
+    const { data: rows, error } = await supabase
+      .from('products')
+      .select('id')
+      .order('created_at', { ascending: true })
+    if (error) throw error
+
+    if (!rows || rows.length === 0) return
+
+    const updates = rows.map((row, index) =>
+      supabase
+        .from('products')
+        .update({ productid: index + 1 })
+        .eq('id', row.id)
+    )
+
+    const results = await Promise.all(updates)
+    const failed = results.find(r => r.error)
+    if (failed?.error) throw failed.error
   }
 }
 

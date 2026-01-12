@@ -73,6 +73,7 @@ function Products() {
     if (confirm('Are you sure you want to delete this product?')) {
       try {
         await productService.delete(id)
+        await productService.resequenceProductIds()
         await loadData()
       } catch (error) {
         console.error('Error deleting product:', error)

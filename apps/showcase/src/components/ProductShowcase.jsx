@@ -35,8 +35,10 @@ function ProductShowcase() {
           categoryService.getAll()
         ])
         
-        // Sort by productId ascending by default
-        const sorted = productsData.sort((a, b) => a.productId - b.productId)
+        // Sort by productid ascending by default
+        const sorted = productsData
+          .slice()
+          .sort((a, b) => Number(a.productid || 0) - Number(b.productid || 0))
         setProducts(sorted)
         setFilteredProducts(sorted)
         setCategories(categoriesData)
@@ -67,12 +69,20 @@ function ProductShowcase() {
     if (searchQuery.trim()) {
       const query = searchQuery.trim()
       result = result.filter((product) =>
-        product.productId.toString().includes(query)
+        product.productid?.toString().includes(query)
       )
     }
 
-    setFilteredProducts(result)
-  }, [products, categories, selectedCategory, searchQuery])
+    if (isRandom) {
+      const shuffled = [...result].sort(() => Math.random() - 0.5)
+      setFilteredProducts(shuffled)
+    } else {
+      const sorted = [...result].sort(
+        (a, b) => Number(a.productid || 0) - Number(b.productid || 0)
+      )
+      setFilteredProducts(sorted)
+    }
+  }, [products, categories, selectedCategory, searchQuery, isRandom])
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId)
@@ -87,16 +97,6 @@ function ProductShowcase() {
     // Toggle between random and ordered
     const newIsRandom = !isRandom
     setIsRandom(newIsRandom)
-    
-    if (newIsRandom) {
-      // Shuffle products
-      const shuffled = [...products].sort(() => Math.random() - 0.5)
-      setFilteredProducts(shuffled)
-    } else {
-      // Sort by productId ascending
-      const sorted = [...products].sort((a, b) => a.productId - b.productId)
-      setFilteredProducts(sorted)
-    }
     
     // Revert button active state after 1.5 seconds
     setTimeout(() => {

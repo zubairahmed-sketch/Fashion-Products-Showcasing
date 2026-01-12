@@ -48,7 +48,7 @@ function ProductGrid({ products, isLoading, error, totalProducts }) {
     <div className="product-grid-container">
       <div className="product-grid">
         {products.map((product) => (
-          <ProductCard key={product._id || product.productId} product={product} />
+          <ProductCard key={product.id || product.productid} product={product} />
         ))}
       </div>
     </div>

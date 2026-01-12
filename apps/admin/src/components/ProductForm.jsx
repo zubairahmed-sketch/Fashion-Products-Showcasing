@@ -1,19 +1,24 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { storageService } from '../services/supabase'
 import './ProductForm.css'
 
 function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
-  const [formData, setFormData] = useState(
-    initialData || {
-      productid: '',
-      category_id: categories.length > 0 ? categories[0].id : '',
-      imageurl: '',
-      sourceurl: ''
-    }
-  )
+  const buildInitialForm = (data) => ({
+    category_id: data?.category_id ?? (categories[0]?.id ?? ''),
+    imageurl: data?.imageurl ?? '',
+    sourceurl: data?.sourceurl ?? ''
+  })
+
+  const [formData, setFormData] = useState(() => buildInitialForm(initialData))
   const [imagePreview, setImagePreview] = useState(initialData?.imageurl || '')
   const [uploading, setUploading] = useState(false)
   const [oldImageUrl, setOldImageUrl] = useState(initialData?.imageurl || '')
+
+  useEffect(() => {
+    setFormData(buildInitialForm(initialData))
+    setImagePreview(initialData?.imageurl || '')
+    setOldImageUrl(initialData?.imageurl || '')
+  }, [initialData, categories])
   
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -57,7 +62,7 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!formData.productid || !formData.category_id || !formData.imageurl || !formData.sourceurl) {
+    if (!formData.category_id || !formData.imageurl || !formData.sourceurl) {
       alert('Please fill all fields')
       return
     }
@@ -67,8 +72,14 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
       return
     }
     
-    // Pass oldImageUrl for update operations
-    onSubmit(formData, oldImageUrl)
+    // Pass only allowed fields to avoid sending relationships to Supabase
+    const payload = {
+      category_id: formData.category_id,
+      imageurl: formData.imageurl,
+      sourceurl: formData.sourceurl
+    }
+
+    onSubmit(payload, oldImageUrl)
   }
   
   return (
@@ -76,18 +87,16 @@ function ProductForm({ categories, onSubmit, initialData = null, onCancel }) {
       <form className="product-form" onSubmit={handleSubmit}>
         <h2>{initialData ? 'Edit Product' : 'Add New Product'}</h2>
         
-        <div className="form-group">
-          <label>Product ID *</label>
-          <input
-            type="number"
-            name="productid"
-            value={formData.productid}
-            onChange={handleInputChange}
-            placeholder="e.g., 1, 2, 3"
-            required
-            disabled={initialData !== null}
-          />
-        </div>
+        {initialData?.productid && (
+          <div className="form-group">
+            <label>Product ID (auto-assigned)</label>
+            <input
+              type="number"
+              value={initialData.productid}
+              disabled
+            />
+          </div>
+        )}
         
         <div className="form-group">
           <label>Category *</label>
