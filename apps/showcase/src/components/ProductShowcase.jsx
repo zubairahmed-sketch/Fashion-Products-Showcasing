@@ -5,6 +5,20 @@ import Sidebar from './Sidebar'
 import { productService, categoryService } from '../services/supabase'
 import './ProductShowcase.css'
 
+// Shuffle but guarantee a different order when possible (helps with tiny lists)
+const shuffleWithChange = (items) => {
+  const arr = [...items]
+  if (arr.length < 2) return arr
+
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+
+  const unchanged = arr.every((item, idx) => item === items[idx])
+  return unchanged ? arr.reverse() : arr
+}
+
 function ProductShowcase() {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
@@ -74,8 +88,7 @@ function ProductShowcase() {
     }
 
     if (isRandom) {
-      const shuffled = [...result].sort(() => Math.random() - 0.5)
-      setFilteredProducts(shuffled)
+      setFilteredProducts(shuffleWithChange(result))
     } else {
       const sorted = [...result].sort(
         (a, b) => Number(a.productid || 0) - Number(b.productid || 0)
