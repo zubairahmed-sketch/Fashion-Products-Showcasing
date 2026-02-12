@@ -1,9 +1,21 @@
 import { createClient } from '@supabase/supabase-js'
 
-const SUPABASE_URL = 'https://bhaudjxjxscvbytjnibd.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoYXVkanhqeHNjdmJ5dGpuaWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwODQ5MjgsImV4cCI6MjA4MjY2MDkyOH0.vvt9lmmEbz0w9vF5AAm4j95LL03dEAhiGeq9DwD2kOg'
+// Pull credentials from Vite env; keep secrets out of source
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  // Fail fast in dev to avoid silent insecure fallback
+  throw new Error('Supabase env vars missing (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY)')
+}
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+})
 
 // Categories API
 export const categoryService = {

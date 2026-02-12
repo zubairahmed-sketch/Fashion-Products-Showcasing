@@ -8,9 +8,13 @@ import Categories from './pages/Categories'
 import './App.css'
 
 function App() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const [activeTab, setActiveTab] = useState('dashboard')
   
+  if (loading) {
+    return <div className="loading">Loading...</div>
+  }
+
   if (!user) {
     return <Login />
   }

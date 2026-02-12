@@ -6,26 +6,36 @@ function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const { login } = useAuth()
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSubmitting(true)
     
     if (!email || !password) {
       setError('Please fill in all fields')
+      setSubmitting(false)
       return
     }
     
     if (password.length < 6) {
       setError('Password must be at least 6 characters')
+      setSubmitting(false)
       return
     }
     
-    const success = login(email, password)
-    if (!success) {
-      setError('Invalid credentials')
+    try {
+      const { error: loginError } = await login(email, password)
+      if (loginError) {
+        setError(loginError.message || 'Invalid credentials')
+      }
+    } catch (err) {
+      setError('Unable to sign in right now. Please try again.')
+      console.error('Login error', err)
     }
+    setSubmitting(false)
   }
   
   return (
@@ -63,16 +73,10 @@ function Login() {
           
           {error && <div className="error-message">{error}</div>}
           
-          <button type="submit" className="btn-login">
-            Login
+          <button type="submit" className="btn-login" disabled={submitting}>
+            {submitting ? 'Signing in...' : 'Login'}
           </button>
         </form>
-        
-        <div className="login-footer">
-          <p>Demo Credentials:</p>
-          <p>Email: <strong>admin@test.com</strong></p>
-          <p>Password: <strong>password123</strong></p>
-        </div>
       </div>
     </div>
   )
